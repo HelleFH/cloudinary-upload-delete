@@ -1,58 +1,124 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+  <div>
+    <form @submit.prevent="handleImageUpload" enctype="multipart/form-data">
+      <div class="upload-section w-100">
+        <div
+          class="upload-zone"
+          style="cursor: pointer"
+          @dragover.prevent
+          @drop="onDrop"
+        >
+          <div class="bg-light text-dark mt-2 mb-2 w-75 p-1">
+            <input
+              type="file"
+              class="text-dark ml-1"
+              @change="onFileChange"
+              accept="image/*"
+            />
+          </div>
+        </div>
+        <div v-if="previewSrc" class="image-preview">
+          <img :src="previewSrc" alt="Preview" class="preview-image" />
+        </div>
+        <div v-else class="preview-message">
+          <p v-if="errorMsg" class="errorMsg">{{ errorMsg }}</p>
+          <p v-else>No preview available for this file</p>
+        </div>
+      </div>
+      <button class="mt-4 mb-4 w-25 button button--orange" type="submit">
+        Submit
+      </button>
+    </form>
   </div>
 </template>
 
 <script>
+import axios from 'axios'; // Import axios for making HTTP requests
+const API_URL = 'http://localhost:3000'; // Replace with your server URL
+
 export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
-  }
-}
+  name: 'UploadImageToCloudinary',
+  data() {
+    return {
+      file: null,
+      previewSrc: '',
+      isPreviewAvailable: false,
+      errorMsg: '',
+    };
+  },
+  methods: {
+    onDrop(event) {
+      event.preventDefault();
+      const droppedFile = event.dataTransfer.files[0];
+      this.setFile(droppedFile);
+      this.previewFile(droppedFile);
+    },
+    onFileChange(event) {
+      const selectedFile = event.target.files[0];
+      this.setFile(selectedFile);
+      this.previewFile(selectedFile);
+    },
+    setFile(file) {
+      this.file = file;
+    },
+    previewFile(file) {
+      const fileReader = new FileReader();
+      fileReader.onload = () => {
+        this.previewSrc = fileReader.result;
+      };
+      fileReader.readAsDataURL(file);
+      this.isPreviewAvailable = file.name.match(/\.(jpeg|jpg|png)$/);
+    },
+    async handleImageUpload() {
+      try {
+        if (!this.file) {
+          this.errorMsg = 'Please select a file to upload.';
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', this.file);
+
+        const response = await axios.post(`${API_URL}/upload`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        // Handle server response
+        console.log(response.data); // For debugging
+
+        // Reset form fields after successful upload
+        this.file = null;
+        this.previewSrc = '';
+        this.errorMsg = ''; // Clear any previous error message
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        this.errorMsg = 'Error uploading image. Please try again.';
+      }
+    },
+  },
+};
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
+.upload-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
+.upload-zone {
+  border: 2px dashed #ccc;
+  padding: 20px;
+  text-align: center;
 }
-li {
-  display: inline-block;
-  margin: 0 10px;
+.preview-message {
+  margin-top: 10px;
 }
-a {
-  color: #42b983;
+.preview-message p {
+  margin: 0;
+}
+.image-preview img {
+  max-width: 100%;
 }
 </style>
