@@ -1,31 +1,44 @@
 const express = require('express');
 const cors = require('cors');
-const cloudinary = require('cloudinary').v2;
-const multer = require('multer');
+const bodyParser = require('body-parser');
 require('dotenv').config();
+const multer = require('multer');
 
-const app = express();
-app.use(express.json());
-app.use(cors());
+const PORT = 3000;
 
-// Configure Cloudinary
+
+const cloudinary = require('cloudinary').v2;
+
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: 'dvagswjsf',
+  api_key: '541989745898263',
+  api_secret: 'ppzQEDXFiCcFdicfNYCupeZaRu0',
 });
 
-// Multer configuration
+
+const app = express();
+
+const corsOptions = {
+  origin: ['http://localhost:8080', '*'],
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
+app.use(bodyParser.json());
+
+
 const upload = multer({
-  storage: multer.memoryStorage(),
+  storage: multer.memoryStorage(), 
   limits: {
-    fileSize: 1000000, // max file size 1MB 
+    fileSize: 100000000, // max file size 10MB 
   },
   fileFilter(req, file, cb) {
     if (!file.originalname.match(/\.(jpeg|jpg|png)$/)) {
       return cb(new Error('Only upload files with jpeg, jpg, or png format.'));
     }
-    cb(null, true);
+    cb(null, true); 
   },
 });
 
@@ -33,10 +46,25 @@ const upload = multer({
 app.post('/upload', upload.single('file'), async (req, res) => {
   try {
     const { buffer } = req.file;
+    const crypto = require('crypto');
 
-    // Upload file to Cloudinary directly from the buffer
+    function generateDeletionToken() {
+      // Generate a random token using crypto module
+      const randomBytes = crypto.randomBytes(32); // Generate 32 random bytes
+      const token = randomBytes.toString('hex'); // Convert bytes to hexadecimal string
+      return token;
+    }
+
+    // Generate a delete token
+    const deleteToken = generateDeletionToken();
+
+    // Upload file to Cloudinary directly from the buffer with folder
     const result = await cloudinary.uploader.upload_stream(
-      { resource_type: 'auto', folder: 'react-upload-delete' }, // Specify the folder name here
+      { 
+        resource_type: 'auto', 
+        folder: 'react-upload-delete', // Specify your folder name here
+        context: { delete_token: deleteToken } // Associate the delete token with the image
+      }, 
       (error, result) => {
         if (error) {
           console.error('Error while uploading to Cloudinary:', error);
@@ -44,7 +72,11 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         }
 
         // If upload succeeds, send the Cloudinary URL and other details in the response
-        res.json({ imageUrl: result.secure_url, publicId: result.public_id });
+        res.json({ 
+          imageUrl: result.secure_url, 
+          publicId: result.public_id, 
+          deleteToken: deleteToken // Send the delete token in the response
+        });
       }
     ).end(buffer);
   } catch (error) {
@@ -52,13 +84,14 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     res.status(500).json({ error: 'Internal server error.' });
   }
 });
+
 // Fetch image URLs route
 app.get('/images', async (req, res) => {
   try {
     const result = await cloudinary.api.resources({
       resource_type: 'image',
       type: 'upload', // Specify the resource type as 'upload' for images
-      prefix: 'react-upload-delete/', // Specify the folder name as the prefix
+      prefix: 'react-upload-delete/', // Specify your folder name here
       max_results: 500
     });
 
@@ -72,26 +105,26 @@ app.get('/images', async (req, res) => {
 });
 
 // Delete image route
-app.delete('/delete/:publicId', async (req, res) => {
+// Delete image route
+app.delete('/delete-image/:publicId', async (req, res) => {
+  const { publicId } = req.params;
+
   try {
-    const { publicId } = req.params;
+    console.log('Deleting image with public ID:', publicId);
 
-    // Delete image from Cloudinary using the public ID
-    const result = await cloudinary.uploader.destroy(publicId);
+    // Proceed with image deletion
+    const deletionOptions = { invalidate: true, type: 'upload', resource_type: 'image' };
+    const result = await cloudinary.uploader.destroy(`react-upload-delete/${publicId}`, deletionOptions);
+    console.log('Cloudinary deletion result:', result);
 
-    if (result.result === 'ok') {
-      res.json({ message: 'Image deleted successfully.' });
-    } else {
-      res.status(400).json({ error: 'Failed to delete image. Please try again later.' });
-    }
+    res.json({ message: 'Image deleted from Cloudinary successfully' });
   } catch (error) {
-    console.error('Error in image deletion:', error);
-    res.status(500).json({ error: 'Internal server error.' });
+    console.error('Cloudinary deletion error:', error);
+    res.status(500).json({ error: 'Failed to delete image from Cloudinary' });
   }
 });
 
-// Start the server
-const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

@@ -1,19 +1,25 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
-  <DisplayImagesFromCloudinary />
+  <div id="app">
+    <img alt="Vue logo" src="./assets/logo.png">
+    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <DisplayImagesFromCloudinary />
 
+  </div>
 </template>
 
 <script>
 import HelloWorld from './components/HelloWorld.vue'
 import DisplayImagesFromCloudinary from './components/viewImages.vue'
-
 export default {
   name: 'App',
   components: {
     HelloWorld,
-    DisplayImagesFromCloudinary
+    DisplayImagesFromCloudinary,
+  },
+  data() {
+    return {
+      prompt: '' // Define prompt data property
+    }
   }
 }
 </script>
