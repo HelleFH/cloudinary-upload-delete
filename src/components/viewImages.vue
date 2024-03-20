@@ -1,11 +1,11 @@
-<template>
-  <div class="container mt-5">
+<template class="mt-6">
+  <div class="container pt-4">
     <div class="row">
       <div class="col-md-4" v-for="(imageUrl, index) in images" :key="index">
         <div class="card mb-3">
           <img :src="imageUrl" :alt="'Image ' + index" class="card-img-top" />
           <div class="card-body">
-            <p class="card-text">Image {{ index + 1 }}</p>
+            <p class="card-text">Image {{imageUrl }}</p>
             <button @click="deleteImage(index)" class="btn btn-danger">Delete</button>
           </div>
         </div>

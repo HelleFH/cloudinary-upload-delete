@@ -1,19 +1,19 @@
 <template>
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <UploadImage msg="Welcome to Your Vue.js App"/>
     <DisplayImagesFromCloudinary />
 
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import UploadImage from './components/UploadImage.vue'
 import DisplayImagesFromCloudinary from './components/viewImages.vue'
 export default {
   name: 'App',
   components: {
-    HelloWorld,
+    UploadImage,
     DisplayImagesFromCloudinary,
   },
   data() {

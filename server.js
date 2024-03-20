@@ -62,7 +62,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     const result = await cloudinary.uploader.upload_stream(
       { 
         resource_type: 'auto', 
-        folder: 'react-upload-delete', // Specify your folder name here
+        folder: 'cloudinary-upload-delete', // Specify your folder name here
         context: { delete_token: deleteToken } // Associate the delete token with the image
       }, 
       (error, result) => {
@@ -91,7 +91,7 @@ app.get('/images', async (req, res) => {
     const result = await cloudinary.api.resources({
       resource_type: 'image',
       type: 'upload', // Specify the resource type as 'upload' for images
-      prefix: 'react-upload-delete/', // Specify your folder name here
+      prefix: 'cloudinary-upload-delete/', // Specify your folder name here
       max_results: 500
     });
 
@@ -114,7 +114,7 @@ app.delete('/delete-image/:publicId', async (req, res) => {
 
     // Proceed with image deletion
     const deletionOptions = { invalidate: true, type: 'upload', resource_type: 'image' };
-    const result = await cloudinary.uploader.destroy(`react-upload-delete/${publicId}`, deletionOptions);
+    const result = await cloudinary.uploader.destroy(`cloudinary-upload-delete/${publicId}`, deletionOptions);
     console.log('Cloudinary deletion result:', result);
 
     res.json({ message: 'Image deleted from Cloudinary successfully' });

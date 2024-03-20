@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <form @submit.prevent="handleImageUpload" enctype="multipart/form-data">
+  <div class="mb-6" >
+    <form  @submit.prevent="handleImageUpload" enctype="multipart/form-data">
       <div class="upload-section w-100">
         <div
           class="upload-zone"
@@ -70,33 +70,37 @@ export default {
       this.isPreviewAvailable = file.name.match(/\.(jpeg|jpg|png)$/);
     },
     async handleImageUpload() {
-      try {
-        if (!this.file) {
-          this.errorMsg = 'Please select a file to upload.';
-          return;
-        }
+  try {
+    if (!this.file) {
+      this.errorMsg = 'Please select a file to upload.';
+      return;
+    }
 
-        const formData = new FormData();
-        formData.append('file', this.file);
+    const formData = new FormData();
+    formData.append('file', this.file);
 
-        const response = await axios.post(`${API_URL}/upload`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+    const response = await axios.post(`${API_URL}/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
 
-        // Handle server response
-        console.log(response.data); // For debugging
+    // Handle server response
+    console.log(response.data); // For debugging
 
-        // Reset form fields after successful upload
-        this.file = null;
-        this.previewSrc = '';
-        this.errorMsg = ''; // Clear any previous error message
-      } catch (error) {
-        console.error('Error uploading image:', error);
-        this.errorMsg = 'Error uploading image. Please try again.';
-      }
-    },
+    // Reset form fields after successful upload
+    this.file = null;
+    this.previewSrc = '';
+    this.errorMsg = ''; // Clear any previous error message
+
+    // Reload the page after successful upload
+    window.location.reload();
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    this.errorMsg = 'Error uploading image. Please try again.';
+  }
+},
+
   },
 };
 </script>
