@@ -20,10 +20,7 @@
         <div v-if="previewSrc" class="image-preview">
           <img :src="previewSrc" alt="Preview" class="preview-image" />
         </div>
-        <div v-else class="preview-message">
-          <p v-if="errorMsg" class="errorMsg">{{ errorMsg }}</p>
-          <p v-else>No preview available for this file</p>
-        </div>
+        
       </div>
       <button class="mt-4 mb-4 w-25 button button--orange" type="submit">
         Submit

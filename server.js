@@ -10,11 +10,10 @@ const PORT = 3000;
 const cloudinary = require('cloudinary').v2;
 
 cloudinary.config({
-  cloud_name: 'dvagswjsf',
-  api_key: '541989745898263',
-  api_secret: 'ppzQEDXFiCcFdicfNYCupeZaRu0',
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
-
 
 const app = express();
 
@@ -34,6 +33,7 @@ const upload = multer({
   limits: {
     fileSize: 100000000, // max file size 10MB 
   },
+  
   fileFilter(req, file, cb) {
     if (!file.originalname.match(/\.(jpeg|jpg|png)$/)) {
       return cb(new Error('Only upload files with jpeg, jpg, or png format.'));
@@ -50,8 +50,8 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 
     function generateDeletionToken() {
       // Generate a random token using crypto module
-      const randomBytes = crypto.randomBytes(32); // Generate 32 random bytes
-      const token = randomBytes.toString('hex'); // Convert bytes to hexadecimal string
+      const randomBytes = crypto.randomBytes(32); 
+      const token = randomBytes.toString('hex'); 
       return token;
     }
 
@@ -63,7 +63,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
       { 
         resource_type: 'auto', 
         folder: 'cloudinary-upload-delete', // Specify your folder name here
-        context: { delete_token: deleteToken } // Associate the delete token with the image
+        context: { delete_token: deleteToken } 
       }, 
       (error, result) => {
         if (error) {
@@ -75,7 +75,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         res.json({ 
           imageUrl: result.secure_url, 
           publicId: result.public_id, 
-          deleteToken: deleteToken // Send the delete token in the response
+          deleteToken: deleteToken 
         });
       }
     ).end(buffer);
@@ -105,14 +105,12 @@ app.get('/images', async (req, res) => {
 });
 
 // Delete image route
-// Delete image route
 app.delete('/delete-image/:publicId', async (req, res) => {
   const { publicId } = req.params;
 
   try {
     console.log('Deleting image with public ID:', publicId);
 
-    // Proceed with image deletion
     const deletionOptions = { invalidate: true, type: 'upload', resource_type: 'image' };
     const result = await cloudinary.uploader.destroy(`cloudinary-upload-delete/${publicId}`, deletionOptions);
     console.log('Cloudinary deletion result:', result);
