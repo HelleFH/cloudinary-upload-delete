@@ -3,7 +3,6 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 require('dotenv').config();
 const multer = require('multer');
-const path = require('path');
 
 
 const PORT = 10000;
@@ -18,7 +17,6 @@ cloudinary.config({
 });
 
 const app = express();
-app.use(express.static(path.join(__dirname, 'dist')));
 
 
 const corsOptions = {
