@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 require('dotenv').config();
 const multer = require('multer');
 
+const PORT = 10000;
 
 
 const cloudinary = require('cloudinary').v2;
@@ -17,7 +18,9 @@ cloudinary.config({
 const app = express();
 
 const corsOptions = {
-  origin: ['http://localhost:8080', 'https://cloudinary-upload-delete.onrender.com', '*'],
+  origin: ['http://localhost:8080', 'https://cloudinary-upload-delete-fe.onrender.com',
+
+  '*'],
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
   optionsSuccessStatus: 204,
@@ -121,3 +124,7 @@ app.delete('/delete-image/:publicId', async (req, res) => {
   }
 });
 
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
