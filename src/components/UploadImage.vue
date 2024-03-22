@@ -8,7 +8,7 @@
           @dragover.prevent
           @drop="onDrop"
         >
-          <div class="bg-light text-dark mt-2 mb-2 w-75 p-1">
+          <div class="bg-light text-dark mt-2 mb-2 w-100 p-1">
             <input
               type="file"
               class="text-dark ml-1"
@@ -22,7 +22,7 @@
         </div>
         
       </div>
-      <button class="mt-4 mb-4 w-25 button button--orange" type="submit">
+      <button class="mt-4 mb-4 w-25 border-none" type="submit">
         Submit
       </button>
     </form>

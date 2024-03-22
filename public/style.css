@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&family=Oswald:wght@200..700&display=swap');
+
+body {
+    background-color: #090F13;
+    color: white;
+}
+
+* {
+    font-family: 'Oswald';
+}
+p {font-family:'orbitron';color:white;}
+h1 {font-family:'orbitron'; color:white; font-size:70px;}
+.image-container {
+    background-color: #153b47;
+    color: white;
+}
+
+button:not(.btn-danger) {
+    background-color: #3d606e !important;
+    color: white !important;
+}
+
+button:hover:not(.btn-danger)  {
+    background-color: #30535f !important;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+  }
+  
+  a:visited {
+    color: inherit;
+  }
+  
+  a:hover {
+    color:  lightblue;
+  }

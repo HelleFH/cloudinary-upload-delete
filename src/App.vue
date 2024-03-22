@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <p class="text-white"> Feel free to upload and delete images</p>
+<h1>AI Images </h1>  
+<p> Feel free to upload and delete images </p>
     <UploadImage msg="Welcome to Your Vue.js App"/>
     <DisplayImagesFromCloudinary />
 
