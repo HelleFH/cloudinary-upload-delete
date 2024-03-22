@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 require('dotenv').config();
 const multer = require('multer');
 
-const PORT = 10000;
+const PORT = 3000;
 
 const cloudinary = require('cloudinary').v2;
 
@@ -17,9 +17,7 @@ cloudinary.config({
 const app = express();
 
 const corsOptions = {
-  origin: ['http://localhost:8080', 'https://cloudinary-upload-delete-fe.onrender.com',
-
-  '*'],
+  origin: ['http://localhost:8080'],
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
   optionsSuccessStatus: 204,

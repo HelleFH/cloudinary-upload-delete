@@ -31,7 +31,7 @@
 
 <script>
 import axios from 'axios'; // Import axios for making HTTP requests
-const API_URL = 'https://cloudinary-upload-delete.onrender.com'; // Replace with your server URL
+const API_URL = 'http://localhost:3000'; // Replace with your server URL
 
 export default {
   name: 'UploadImageToCloudinary',
