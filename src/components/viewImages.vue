@@ -37,7 +37,7 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import DeleteConfirmationModal from './DeleteConfirmationModal.vue';
 
-const API_URL = 'https://react-listings.onrender.com';
+const API_URL = 'https://cloudinary-upload-delete.onrender.com';
 
 export default {
   name: 'DisplayImagesFromCloudinary',
