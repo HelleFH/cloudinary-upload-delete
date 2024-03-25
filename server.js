@@ -3,8 +3,10 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 require('dotenv').config();
 const multer = require('multer');
+const NodeCache = require('node-cache');
 
-const PORT = 3000;
+
+const PORT = 10000;
 
 const cloudinary = require('cloudinary').v2;
 
@@ -17,7 +19,7 @@ cloudinary.config({
 const app = express();
 
 const corsOptions = {
-  origin: ['http://localhost:8080'],
+  origin: ['https://react-listings-frontend.onrender.com'],
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
   optionsSuccessStatus: 204,
@@ -26,6 +28,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
+const cache = new NodeCache({ stdTTL: 600 });
 
 const upload = multer({
   storage: multer.memoryStorage(), 
@@ -87,14 +90,25 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 // Fetch image URLs route
 app.get('/images', async (req, res) => {
   try {
+    // Check if image URLs are already cached
+    const cachedImageUrls = cache.get('imageUrls');
+    if (cachedImageUrls) {
+      console.log('Retrieving image URLs from cache');
+      return res.json({ imageUrls: cachedImageUrls });
+    }
+
+    // If not cached, fetch image URLs from Cloudinary
     const result = await cloudinary.api.resources({
       resource_type: 'image',
-      type: 'upload', // Specify the resource type as 'upload' for images
-      prefix: 'cloudinary-upload-delete/', // Specify your folder name here
+      type: 'upload',
+      prefix: 'cloudinary-upload-delete/',
       max_results: 500
     });
 
     const imageUrls = result.resources.map(resource => resource.secure_url);
+
+    // Cache the image URLs for future requests
+    cache.set('imageUrls', imageUrls);
 
     res.json({ imageUrls });
   } catch (error) {
@@ -102,7 +116,6 @@ app.get('/images', async (req, res) => {
     res.status(500).json({ error: 'Internal server error.' });
   }
 });
-
 // Delete image route
 app.delete('/delete-image/:publicId', async (req, res) => {
   const { publicId } = req.params;
