@@ -19,7 +19,7 @@ cloudinary.config({
 const app = express();
 
 const corsOptions = {
-  origin: ['https://cloudinary-upload-delete-fe.onrender.com'],
+  origin: ['https://cloudinary-upload-delete-1.onrender.com'],
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
   optionsSuccessStatus: 204,
